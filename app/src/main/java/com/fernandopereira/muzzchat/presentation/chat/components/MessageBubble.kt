@@ -18,12 +18,11 @@ import com.fernandopereira.muzzchat.domain.model.User.ME
 import com.fernandopereira.muzzchat.domain.model.User.SARAH
 import com.fernandopereira.muzzchat.ui.common.ThemePreviews
 import com.fernandopereira.muzzchat.ui.theme.MuzzChatTheme
-import com.fernandopereira.muzzchat.ui.theme.Radius0
-import com.fernandopereira.muzzchat.ui.theme.Radius100
-import com.fernandopereira.muzzchat.ui.theme.Radius400
-import com.fernandopereira.muzzchat.ui.theme.Space050
-import com.fernandopereira.muzzchat.ui.theme.Space200
-import com.fernandopereira.muzzchat.ui.theme.Space300
+import com.fernandopereira.muzzchat.ui.theme.RadiusSmall
+import com.fernandopereira.muzzchat.ui.theme.RadiusLarge
+import com.fernandopereira.muzzchat.ui.theme.Dimen2
+import com.fernandopereira.muzzchat.ui.theme.Dimen8
+import com.fernandopereira.muzzchat.ui.theme.Dimen12
 
 @Composable
 fun MessageBubble(
@@ -31,13 +30,9 @@ fun MessageBubble(
     isGroupedWithNext: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val style =
-        bubbleStyle(
-            sender = message.sender,
-            isGroupedWithNext = isGroupedWithNext,
-        )
+    val style = bubbleStyle(sender = message.sender)
 
-    val bottomSpacing = if (isGroupedWithNext) Space050 else Space200
+    val bottomSpacing = if (isGroupedWithNext) Dimen2 else Dimen8
 
     Row(
         modifier =
@@ -70,62 +65,35 @@ private fun BubbleSurface(
     ) {
         Text(
             text = text,
-            modifier = Modifier.padding(horizontal = Space300, vertical = Space200),
+            modifier = Modifier.padding(horizontal = Dimen12, vertical = Dimen8),
         )
     }
 }
 
 @Composable
-private fun bubbleStyle(
-    sender: User,
-    isGroupedWithNext: Boolean,
-): BubbleStyle {
+private fun bubbleStyle(sender: User): BubbleStyle {
     val isMine = sender == ME
-    val bubbleColor = if (isMine) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
     return BubbleStyle(
         arrangement = if (isMine) Arrangement.End else Arrangement.Start,
-        bubbleColor = bubbleColor,
-        contentColor =
-            if (isMine) {
-                MaterialTheme.colorScheme.onPrimaryContainer
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            },
-        shape =
-            bubbleShape(
-                sender = sender,
-                isGroupedWithNext = isGroupedWithNext,
-            ),
+        bubbleColor = if (isMine) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = if (isMine) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+        shape = if (isMine) {
+            RoundedCornerShape(
+                topStart = RadiusLarge,
+                topEnd = RadiusLarge,
+                bottomEnd = RadiusSmall,
+                bottomStart = RadiusLarge,
+            )
+        } else {
+            RoundedCornerShape(
+                topStart = RadiusLarge,
+                topEnd = RadiusLarge,
+                bottomEnd = RadiusLarge,
+                bottomStart = RadiusSmall,
+            )
+        },
     )
 }
-
-private fun bubbleShape(
-    sender: User,
-    isGroupedWithNext: Boolean,
-): RoundedCornerShape =
-    when {
-        !isGroupedWithNext -> {
-            RoundedCornerShape(Radius400)
-        }
-
-        sender == ME -> {
-            RoundedCornerShape(
-                topStart = Radius400,
-                topEnd = Radius400,
-                bottomEnd = Radius0,
-                bottomStart = Radius400,
-            )
-        }
-
-        else -> {
-            RoundedCornerShape(
-                topStart = Radius400,
-                topEnd = Radius400,
-                bottomEnd = Radius400,
-                bottomStart = Radius0,
-            )
-        }
-    }
 
 private data class BubbleStyle(
     val arrangement: Arrangement.Horizontal,
@@ -139,24 +107,17 @@ private data class BubbleStyle(
 private fun MessageBubblePreview() {
     MuzzChatTheme {
         Surface {
-        Column(modifier = Modifier.padding(Space300)) {
+        Column(modifier = Modifier.padding(Dimen12)) {
             MessageBubble(
-                message =
-                    Message(
-                        text = "Hey, are you free later?",
-                        sender = SARAH,
-                        timestamp = 0L,
-                    ),
+                message = Message(text = "Hey, are you free later?", sender = SARAH, timestamp = 0L),
                 isGroupedWithNext = true,
             )
-
             MessageBubble(
-                message =
-                    Message(
-                        text = "Yep, I can jump on a call after lunch.",
-                        sender = ME,
-                        timestamp = 0L,
-                    ),
+                message = Message(text = "Sure, what time?", sender = SARAH, timestamp = 0L),
+                isGroupedWithNext = false,
+            )
+            MessageBubble(
+                message = Message(text = "Yep, I can jump on a call after lunch.", sender = ME, timestamp = 0L),
                 isGroupedWithNext = false,
             )
         }

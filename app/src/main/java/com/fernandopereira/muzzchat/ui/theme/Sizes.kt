@@ -2,24 +2,21 @@ package com.fernandopereira.muzzchat.ui.theme
 
 import androidx.compose.ui.unit.dp
 
-// Space
-val Space0 = 0.dp
-val Space050 = 2.dp
-val Space100 = 4.dp
-val Space150 = 6.dp
-val Space200 = 8.dp
-val Space300 = 12.dp
-val Space400 = 16.dp
-val Space600 = 24.dp
-val Space800 = 32.dp
-val Space1200 = 48.dp
-val Space2400 = 64.dp
-val Space3000 = 120.dp
-val Space4000 = 160.dp
+// Spacing
+val Dimen2 = 2.dp
+val Dimen4 = 4.dp
+val Dimen8 = 8.dp
+val Dimen12 = 12.dp
+val Dimen16 = 16.dp
+val Dimen48 = 48.dp
 
 // Radius
-val Radius0 = 4.dp
-val Radius100 = 4.dp
-val Radius200 = 8.dp
-val Radius400 = 16.dp
-val RadiusInfinite = 9999.dp
+val RadiusSmall = 4.dp
+val RadiusLarge = 16.dp
+val RadiusFull = 9999.dp
+
+// Elevation
+val ElevationAppBar = 4.dp
+
+// Component sizes
+val SizeAvatar = 36.dp

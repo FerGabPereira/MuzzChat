@@ -29,12 +29,12 @@ import androidx.compose.ui.text.input.ImeAction
 import com.fernandopereira.muzzchat.R
 import com.fernandopereira.muzzchat.ui.common.ThemePreviews
 import com.fernandopereira.muzzchat.ui.theme.MuzzChatTheme
-import com.fernandopereira.muzzchat.ui.theme.RadiusInfinite
-import com.fernandopereira.muzzchat.ui.theme.Space050
-import com.fernandopereira.muzzchat.ui.theme.Space100
-import com.fernandopereira.muzzchat.ui.theme.Space1200
-import com.fernandopereira.muzzchat.ui.theme.Space200
-import com.fernandopereira.muzzchat.ui.theme.Space400
+import com.fernandopereira.muzzchat.ui.theme.RadiusFull
+import com.fernandopereira.muzzchat.ui.theme.Dimen2
+import com.fernandopereira.muzzchat.ui.theme.Dimen4
+import com.fernandopereira.muzzchat.ui.theme.Dimen48
+import com.fernandopereira.muzzchat.ui.theme.Dimen8
+import com.fernandopereira.muzzchat.ui.theme.Dimen16
 
 @Composable
 fun MessageInput(
@@ -48,16 +48,16 @@ fun MessageInput(
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Space200),
+        horizontalArrangement = Arrangement.spacedBy(Dimen8),
     ) {
         Surface(
             modifier = Modifier
                 .weight(1f)
-                .height(Space1200),
-            shape = RoundedCornerShape(RadiusInfinite),
+                .height(Dimen48),
+            shape = RoundedCornerShape(RadiusFull),
             color = MaterialTheme.colorScheme.surface,
             border = BorderStroke(
-                width = Space050,
+                width = Dimen2,
                 color = MaterialTheme.colorScheme.primary,
             ),
         ) {
@@ -66,7 +66,7 @@ fun MessageInput(
                 onValueChange = onTextChange,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = Space400),
+                    .padding(horizontal = Dimen16),
                 singleLine = true,
                 textStyle = MaterialTheme.typography.bodyLarge.copy(
                     color = MaterialTheme.colorScheme.onSurface,
@@ -101,7 +101,7 @@ fun MessageInput(
         FilledIconButton(
             onClick = onSend,
             enabled = isSendEnabled,
-            modifier = Modifier.size(Space1200),
+            modifier = Modifier.size(Dimen48),
             colors = IconButtonDefaults.filledIconButtonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -126,7 +126,7 @@ private fun MessageInputPreview() {
                 text = "Hey, Sara looks great",
                 onTextChange = {},
                 onSend = {},
-                modifier = Modifier.padding(Space200),
+                modifier = Modifier.padding(Dimen8),
             )
         }
     }

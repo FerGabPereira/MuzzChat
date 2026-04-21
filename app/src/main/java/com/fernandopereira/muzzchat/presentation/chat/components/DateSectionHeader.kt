@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.withStyle
 import com.fernandopereira.muzzchat.ui.common.ThemePreviews
 import com.fernandopereira.muzzchat.ui.theme.MuzzChatTheme
-import com.fernandopereira.muzzchat.ui.theme.Space200
+import com.fernandopereira.muzzchat.ui.theme.Dimen8
 
 @Composable
 fun DateSectionHeader(
@@ -28,7 +28,7 @@ fun DateSectionHeader(
         modifier =
             modifier
                 .fillMaxWidth()
-                .padding(vertical = Space200),
+                .padding(vertical = Dimen8),
         verticalAlignment = CenterVertically,
         horizontalArrangement = Center,
     ) {

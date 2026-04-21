@@ -7,19 +7,12 @@ import java.util.Locale.ENGLISH
 
 private val defaultZoneId = ZoneId.systemDefault()
 
-// Just for simplification we are gonna assume the app is only available in English
-private val dayHeaderFormatter: DateTimeFormatter =
-    DateTimeFormatter
-        .ofPattern("EEEE", ENGLISH)
-        .withZone(defaultZoneId)
+// For simplicity, we assume the app is always used in the device's local timezone.
+private val dayFormatter = DateTimeFormatter.ofPattern("EEEE", ENGLISH)
+private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm", ENGLISH)
 
-private val timeHeaderFormatter: DateTimeFormatter =
-    DateTimeFormatter
-        .ofPattern("HH:mm", ENGLISH)
-        .withZone(defaultZoneId)
+fun formatDay(timestamp: Long): String =
+    dayFormatter.format(ofEpochMilli(timestamp).atZone(defaultZoneId))
 
-internal fun formatDay(timestamp: Long): String =
-    dayHeaderFormatter.format(ofEpochMilli(timestamp))
-
-internal fun formatTime(timestamp: Long): String =
-    timeHeaderFormatter.format(ofEpochMilli(timestamp))
+fun formatTime(timestamp: Long): String =
+    timeFormatter.format(ofEpochMilli(timestamp).atZone(defaultZoneId))
