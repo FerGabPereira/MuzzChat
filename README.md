@@ -64,3 +64,11 @@ The View dispatches actions, and all state mutations go through `submitState { c
 
 There is no `UiEffect` channel because this screen has no one-shot side effects such as navigation, snackbars, or permission requests.
 Everything the UI needs is durable state: the rendered chat items, the current input text, and the active sender.
+
+### Dependency injection
+
+The app uses Koin with a single application module because the project is intentionally small: one screen, one repository, one database, one ViewModel.
+A single module keeps the dependency graph easy to read and avoids unnecessary structure.
+
+Koin was chosen over Hilt because the setup cost is lower for a small exercise and the graph is simple enough that explicit module wiring stays readable.
+This keeps the project lightweight while still giving proper dependency construction for the database, repository, use case, and ViewModel.
