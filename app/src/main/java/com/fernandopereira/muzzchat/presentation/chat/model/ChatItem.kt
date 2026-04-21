@@ -3,10 +3,19 @@ package com.fernandopereira.muzzchat.presentation.chat.model
 import com.fernandopereira.muzzchat.domain.model.Message
 
 sealed interface ChatItem {
+    val key: Any
+
     data class MessageItem(
         val message: Message,
         val isGroupedWithNext: Boolean,
-    ) : ChatItem
+    ) : ChatItem {
+        override val key: Any get() = "msg_${message.id}"
+    }
 
-    data class DateHeader(val day: String, val time: String) : ChatItem
+    data class DateHeader(
+        val day: String,
+        val time: String,
+    ) : ChatItem {
+        override val key: Any get() = "header_${day}_${time}"
+    }
 }

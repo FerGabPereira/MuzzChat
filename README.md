@@ -72,3 +72,9 @@ A single module keeps the dependency graph easy to read and avoids unnecessary s
 
 Koin was chosen over Hilt because the setup cost is lower for a small exercise and the graph is simple enough that explicit module wiring stays readable.
 This keeps the project lightweight while still giving proper dependency construction for the database, repository, use case, and ViewModel.
+
+### Screen — LazyColumn and IME
+
+`MainActivity` calls `enableEdgeToEdge()`, which draws behind both the status bar and the navigation bar. To prevent the `Scaffold` from consuming the IME inset, `contentWindowInsets` is pinned to `WindowInsets.systemBars` only. The `Column` that holds the message list, sender selector, and input field applies `imePadding()` independently — this causes the entire input area to slide above the soft keyboard without requiring any `windowSoftInputMode` change in the manifest.
+
+Auto-scroll is driven by `LaunchedEffect(uiState.items.size)`: any time a message is added the list animates to its last index. Keying the effect on `items.size` means it only fires on list growth, not on every recomposition.
