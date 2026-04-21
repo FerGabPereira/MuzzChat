@@ -43,7 +43,7 @@ fun ChatScreen(viewModel: ChatViewModel = koinViewModel()) {
 
     Scaffold(
         contentWindowInsets = WindowInsets.systemBars.union(WindowInsets.displayCutout),
-        topBar = { ChatTopBar() },
+        topBar = { ChatTopBar(onClearChat = { viewModel.onAction(ChatUiAction.ClearChat) }) },
     ) { innerPadding ->
         Column(
             modifier =

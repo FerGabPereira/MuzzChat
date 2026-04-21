@@ -5,6 +5,7 @@ import com.fernandopereira.muzzchat.domain.model.Message
 import com.fernandopereira.muzzchat.domain.repository.MessageRepository
 import com.fernandopereira.muzzchat.domain.usecase.BuildChatItemsUseCase
 import com.fernandopereira.muzzchat.presentation.BaseViewModel
+import com.fernandopereira.muzzchat.presentation.chat.ChatUiAction.ClearChat
 import com.fernandopereira.muzzchat.presentation.chat.ChatUiAction.InputChanged
 import com.fernandopereira.muzzchat.presentation.chat.ChatUiAction.OnSendMessageClicked
 import com.fernandopereira.muzzchat.presentation.chat.ChatUiAction.OnSwitchUserClicked
@@ -32,6 +33,8 @@ class ChatViewModel(
             OnSwitchUserClicked -> {
                 submitState { copy(currentUser = currentUser.other()) }
             }
+
+            ClearChat -> viewModelScope.launch { repository.deleteAll() }
         }
     }
 

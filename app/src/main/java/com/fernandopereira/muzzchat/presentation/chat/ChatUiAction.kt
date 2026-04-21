@@ -8,4 +8,6 @@ sealed interface ChatUiAction : UiAction {
     data object OnSendMessageClicked : ChatUiAction
 
     data object OnSwitchUserClicked : ChatUiAction
+
+    data object ClearChat : ChatUiAction
 }

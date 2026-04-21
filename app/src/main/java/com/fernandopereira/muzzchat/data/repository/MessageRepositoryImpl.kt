@@ -15,4 +15,6 @@ class MessageRepositoryImpl(private val dao: MessageDao) : MessageRepository {
     override suspend fun insert(message: Message) {
         dao.insert(message.toEntity())
     }
+
+    override suspend fun deleteAll() = dao.deleteAll()
 }

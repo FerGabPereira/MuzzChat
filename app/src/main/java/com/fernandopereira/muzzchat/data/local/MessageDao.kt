@@ -12,4 +12,7 @@ interface MessageDao {
 
     @Insert
     suspend fun insert(entity: MessageEntity)
+
+    @Query("DELETE FROM messages")
+    suspend fun deleteAll()
 }
