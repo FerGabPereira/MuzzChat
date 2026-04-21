@@ -78,3 +78,27 @@ This keeps the project lightweight while still giving proper dependency construc
 `MainActivity` calls `enableEdgeToEdge()`, which draws behind both the status bar and the navigation bar. To prevent the `Scaffold` from consuming the IME inset, `contentWindowInsets` is pinned to `WindowInsets.systemBars` only. The `Column` that holds the message list, sender selector, and input field applies `imePadding()` independently — this causes the entire input area to slide above the soft keyboard without requiring any `windowSoftInputMode` change in the manifest.
 
 Auto-scroll is driven by `LaunchedEffect(uiState.items.size)`: any time a message is added the list animates to its last index. Keying the effect on `items.size` means it only fires on list growth, not on every recomposition.
+
+---
+
+## Limitations and trade-offs
+
+**Seed data runs fire-and-forget.** `DatabaseSeeder.seedIfEmpty()` is launched in a detached `CoroutineScope(Dispatchers.IO)` from `Application.onCreate()`. For ~10 SQLite inserts this completes well within a single frame, so in practice the UI never renders an empty list on first launch. A production app with a larger or slower seed would need to hold the splash screen via `SplashScreen.setKeepOnScreenCondition` until the operation finishes.
+
+**No error handling on seed.** If the database insert fails (e.g. disk full), the exception is silently swallowed. The app still opens but with an empty chat. This is acceptable for demo data — a real app would log the error or surface it.
+
+**Two fixed users, no auth.** The sender is toggled via a UI button rather than any form of identity. This is intentional per the spec but means the "Reply as Sarah" pattern would not survive a multi-device or server-backed scenario without rework.
+
+**No pagination.** `MessageDao.observeAll()` loads the full message history into memory on every emission. For a demo this is fine; a production chat would use `PagingSource` to avoid loading thousands of rows at once.
+
+---
+
+## What I'd do with more time
+
+**Pagination.** Replace the `Flow<List<MessageEntity>>` query with a `PagingSource` and wire it to `LazyPagingItems` in the Compose layer.
+
+**Proper splash screen guard.** If the seed dataset grew, I'd add `core-splashscreen` and hold the screen with `setKeepOnScreenCondition` rather than relying on timing.
+
+**UI tests.** The business logic is covered by unit tests, but there are no Compose UI tests. I'd add a test that seeds a known message list and asserts that `DateSectionHeader` and grouped spacing are rendered correctly.
+
+**Message timestamps.** Currently messages show no per-message timestamp. The design shows them; I'd add a `Text` below each bubble that appears conditionally (e.g. only on the last message of a group).

@@ -1,6 +1,7 @@
 package com.fernandopereira.muzzchat.di
 
 import com.fernandopereira.muzzchat.data.local.MessageDatabase
+import com.fernandopereira.muzzchat.data.local.DatabaseSeeder
 import com.fernandopereira.muzzchat.data.repository.MessageRepositoryImpl
 import com.fernandopereira.muzzchat.domain.repository.MessageRepository
 import com.fernandopereira.muzzchat.domain.usecase.BuildChatItemsUseCase
@@ -14,6 +15,7 @@ val appModule =
         single { MessageDatabase.build(androidContext()) }
         single { get<MessageDatabase>().messageDao() }
         single<MessageRepository> { MessageRepositoryImpl(dao = get()) }
+        single { DatabaseSeeder(dao = get()) }
         factory { BuildChatItemsUseCase() }
         viewModel { ChatViewModel(repository = get(), buildChatItemsUseCase = get()) }
     }
