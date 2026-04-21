@@ -79,6 +79,22 @@ class MessageRepositoryTest {
         }
 
     @Test
+    fun `GIVEN a repository WHEN deleteAll is called THEN delegates to dao deleteAll`() =
+        runTest {
+            // GIVEN
+            every { dao.observeAll() } returns flowOf(emptyList())
+            coEvery { dao.deleteAll() } returns Unit
+
+            val repository = MessageRepositoryImpl(dao = dao)
+
+            // WHEN
+            repository.deleteAll()
+
+            // THEN
+            coVerify(exactly = 1) { dao.deleteAll() }
+        }
+
+    @Test
     fun `GIVEN a domain message WHEN insert is called THEN repository maps it and delegates to dao`() =
         runTest {
             // GIVEN

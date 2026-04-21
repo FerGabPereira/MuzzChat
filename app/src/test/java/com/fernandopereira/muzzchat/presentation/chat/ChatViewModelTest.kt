@@ -228,6 +228,53 @@ class ChatViewModelTest {
             }
         }
 
+    @Test
+    fun `GIVEN clear chat action WHEN handled THEN repository deleteAll is called`() =
+        runTest {
+            // GIVEN
+            every { repository.messages } returns MutableStateFlow(emptyList())
+            coEvery { repository.insert(any()) } returns Unit
+            coEvery { repository.deleteAll() } returns Unit
+
+            val viewModel = createViewModel()
+
+            // WHEN
+            viewModel.onAction(ChatUiAction.ClearChat)
+            advanceUntilIdle()
+
+            // THEN
+            coVerify(exactly = 1) { repository.deleteAll() }
+        }
+
+    @Test
+    fun `GIVEN messages in state WHEN clear chat is handled THEN items become empty`() =
+        runTest {
+            // GIVEN
+            val messagesFlow = MutableStateFlow(listOf(message(id = 1, timestamp = T0, sender = ME)))
+            every { repository.messages } returns messagesFlow
+            coEvery { repository.insert(any()) } returns Unit
+            coEvery { repository.deleteAll() } coAnswers { messagesFlow.value = emptyList() }
+
+            val viewModel = createViewModel()
+
+            viewModel.uiState.test {
+                assertEquals(ChatUiState(), awaitItem())
+
+                advanceUntilIdle()
+
+                assert(awaitItem().items.isNotEmpty())
+
+                // WHEN
+                viewModel.onAction(ChatUiAction.ClearChat)
+                advanceUntilIdle()
+
+                // THEN
+                assertEquals(ChatUiState(), awaitItem())
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     private fun createViewModel(): ChatViewModel =
         ChatViewModel(
             repository = repository,

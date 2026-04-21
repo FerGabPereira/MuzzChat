@@ -1,17 +1,18 @@
 # MuzzChat
 
-A chat interface for Android built as a technical exercise. Two fixed users, persistent messages, observable architecture.
+Android chat technical exercise. One screen, two fixed users, persistent messages.
+
+**Min SDK 29 · Kotlin · Jetpack Compose · Room · Koin**
 
 ---
 
 ## Architecture
 
-Single-module MVI. State flows in one direction; the View never mutates it directly.
+Single-module MVI with strict unidirectional data flow.
 
 ```
 ┌─────────────────────────────────┐
 │         Presentation            │
-│                                 │
 │   View  ──Intent──▶  ViewModel  │
 │    ▲                     │      │
 │    └──────UiState─────────┘     │
@@ -19,86 +20,101 @@ Single-module MVI. State flows in one direction; the View never mutates it direc
                │
 ┌──────────────▼──────────────────┐
 │            Domain               │
-│                                 │
 │       UseCases · Models         │
 └──────────────┬──────────────────┘
                │
 ┌──────────────▼──────────────────┐
 │             Data                │
-│                                 │
 │      Repository · Room          │
 └─────────────────────────────────┘
 ```
 
-The choice to stay single-module was deliberate. This is one screen between two fixed users — splitting it into feature and data modules would add Gradle complexity and indirection with no real payoff.
+**Single-module was deliberate.** One screen, two fixed users — splitting into `:data` / `:feature` modules would add Gradle overhead with no meaningful isolation boundary.
 
 ---
 
 ## Stack
 
-- **Jetpack Compose** — UI
-- **Room + Flow** — persistent storage with observable queries
-- **Koin** — dependency injection
+| Category | Libraries |
+|---|---|
+| UI | Jetpack Compose · Material Design 3 · Material Icons Extended |
+| Persistence | Room · KSP (annotation processing) |
+| DI | Koin BOM — android + compose artifacts |
+| Async | Kotlin Coroutines · StateFlow |
+| Testing | JUnit 4 · MockK · Turbine · kotlinx-coroutines-test |
+
+**Non-trivial choices:**
+
+| Decision | Rationale |
+|---|---|
+| Koin over Hilt | Hilt requires Dagger and more setup. For a single-module, single-screen app the entire DI graph fits in one readable file. Hilt would be the right call at multi-module scale. |
+| KSP over KAPT | Faster incremental builds and first-class Kotlin support. Room has supported KSP since 2.4 with no trade-offs. |
+| `java.time` | minSdk 29 covers all `java.time` APIs natively — no core library desugaring. `SimpleDateFormat` is mutable and thread-unsafe. |
 
 ---
 
 ## Key decisions
 
-### BuildChatItemsUseCase
+### `BuildChatItemsUseCase` — pure Kotlin, JVM-testable
 
-`BuildChatItemsUseCase` is a pure Kotlin class with a single `operator fun invoke(messages: List<Message>): List<ChatItem>`. It has no Android dependencies — no `Context`, no `ViewModel`, nothing from the SDK. This means it can be unit-tested with plain JUnit, without Robolectric or an instrumented device. The ViewModel just calls it and forwards the result into state; all the grouping logic stays in one testable place.
+`List<Message> → List<ChatItem>`, no `Context`, no Android SDK type. Runs in plain JUnit without Robolectric or an instrumented device. All grouping logic lives in one place; the ViewModel just calls it and forwards the result into state.
 
-The two rules it applies are asymmetric in the direction they look:
+The two decoration rules look in opposite directions:
 
-- **DateHeader** looks *backward*. To know whether to insert a header before message N, you need to know when message N−1 was sent. If there is no previous message, or the gap is ≥ 1 hour, a header is inserted.
-- **isGroupedWithNext** looks *forward*. To know whether message N should have reduced spacing below it, you need to know when message N+1 will arrive and whether it comes from the same sender. If the next message exists, shares the sender, and arrives within 20 seconds, the flag is set to `true`.
+- **DateHeader** — looks *back*. Insert before message N if there is no previous message, or the gap to N−1 is ≥ 1 hour.
+- **isGroupedWithNext** — looks *forward*. Set `true` on message N when N+1 exists, shares the sender, and arrives within 20 seconds.
 
-This look-ahead vs look-back asymmetry is why a simple `fold` or `map` isn't enough — the use case iterates with `forEachIndexed` and reads both `index - 1` and `index + 1` via `getOrNull`.
+This asymmetry means a `map` or `fold` doesn't fit; the use case iterates with `forEachIndexed` and reads both neighbours via `getOrNull(index ± 1)`.
 
-### State management
+### `BaseViewModel` — equality short-circuit
 
-The presentation layer uses a small `UiState` / `UiAction` contract with a generic `BaseViewModel`.
-The View dispatches actions, and all state mutations go through `submitState { copy(...) }`, which keeps updates centralized and predictable.
+```kotlin
+protected fun submitState(reducer: State.() -> State) {
+    val new = _uiState.value.reducer()
+    if (new == currentState) return   // skips emission on no-op
+    _uiState.value = new
+}
+```
 
-`submitState` short-circuits when the reducer returns an equal state, avoiding redundant `StateFlow` emissions and unnecessary recomposition.
+Prevents redundant `StateFlow` emissions and downstream recompositions when an action produces no observable change in state.
 
-There is no `UiEffect` channel because this screen has no one-shot side effects such as navigation, snackbars, or permission requests.
-Everything the UI needs is durable state: the rendered chat items, the current input text, and the active sender.
+### No `UiEffect`
 
-### Dependency injection
+Every piece of information the UI needs — `items`, `inputText`, `currentUser` — is durable state. There are no one-shot side effects (navigation, snackbars, permissions), so a `Channel<Effect>` would add lifecycle risk with no benefit. `UiEffect` is introduced only when the screen actually needs it.
 
-The app uses Koin with a single application module because the project is intentionally small: one screen, one repository, one database, one ViewModel.
-A single module keeps the dependency graph easy to read and avoids unnecessary structure.
+### Optimistic input clear
 
-Koin was chosen over Hilt because the setup cost is lower for a small exercise and the graph is simple enough that explicit module wiring stays readable.
-This keeps the project lightweight while still giving proper dependency construction for the database, repository, use case, and ViewModel.
+The input field is cleared *before* the `repository.insert()` coroutine launches. This removes the visible flicker where text lingers until the DB write completes. The trade-off is that a failed write silently drops the message — acceptable for a demo; production code would catch the exception and restore the text.
 
-### Screen — LazyColumn and IME
+### IME + edge-to-edge
 
-`MainActivity` calls `enableEdgeToEdge()`, which draws behind both the status bar and the navigation bar. To prevent the `Scaffold` from consuming the IME inset, `contentWindowInsets` is pinned to `WindowInsets.systemBars` only. The `Column` that holds the message list, sender selector, and input field applies `imePadding()` independently — this causes the entire input area to slide above the soft keyboard without requiring any `windowSoftInputMode` change in the manifest.
-
-Auto-scroll is driven by `LaunchedEffect(uiState.items.size)`: any time a message is added the list animates to its last index. Keying the effect on `items.size` means it only fires on list growth, not on every recomposition.
-
----
-
-## Limitations and trade-offs
-
-**Seed data runs fire-and-forget.** `DatabaseSeeder.seedIfEmpty()` is launched in a detached `CoroutineScope(Dispatchers.IO)` from `Application.onCreate()`. For ~10 SQLite inserts this completes well within a single frame, so in practice the UI never renders an empty list on first launch. A production app with a larger or slower seed would need to hold the splash screen via `SplashScreen.setKeepOnScreenCondition` until the operation finishes.
-
-**No error handling on seed.** If the database insert fails (e.g. disk full), the exception is silently swallowed. The app still opens but with an empty chat. This is acceptable for demo data — a real app would log the error or surface it.
-
-**Two fixed users, no auth.** The sender is toggled via a UI button rather than any form of identity. This is intentional per the spec but means the "Reply as Sarah" pattern would not survive a multi-device or server-backed scenario without rework.
-
-**No pagination.** `MessageDao.observeAll()` loads the full message history into memory on every emission. For a demo this is fine; a production chat would use `PagingSource` to avoid loading thousands of rows at once.
+`enableEdgeToEdge()` draws behind both bars. `Scaffold.contentWindowInsets` is pinned to `systemBars` only; `imePadding()` is applied on the inner `Column`. This slides the entire input area above the soft keyboard without a `windowSoftInputMode` change in the manifest and avoids double-padding from the scaffold consuming the IME inset.
 
 ---
 
-## What I'd do with more time
+## Testing
 
-**Pagination.** Replace the `Flow<List<MessageEntity>>` query with a `PagingSource` and wire it to `LazyPagingItems` in the Compose layer.
+`BuildChatItemsUseCase`, `MessageRepository`, and `ChatViewModel` are covered by unit tests running on the JVM.
 
-**Proper splash screen guard.** If the seed dataset grew, I'd add `core-splashscreen` and hold the screen with `setKeepOnScreenCondition` rather than relying on timing.
+- **Turbine** for `StateFlow` / `Flow` assertions — avoids the `launch` + `Channel` plumbing of manual collection.
+- **MockK** for all test doubles — no hand-written fakes.
+- **`StandardTestDispatcher`** + `advanceUntilIdle()` for deterministic coroutine control.
+- Test naming: `` `given X when Y then Z` `` with `// GIVEN / WHEN / THEN` sections in the body.
 
-**UI tests.** The business logic is covered by unit tests, but there are no Compose UI tests. I'd add a test that seeds a known message list and asserts that `DateSectionHeader` and grouped spacing are rendered correctly.
+---
 
-**Message timestamps.** Currently messages show no per-message timestamp. The design shows them; I'd add a `Text` below each bubble that appears conditionally (e.g. only on the last message of a group).
+## What I Would Have Done With More Time
+
+The following are conscious trade-offs made to keep scope focused. Each point describes the current limitation and how it would be addressed in a production app.
+
+**Pagination.** `MessageDao.observeAll()` loads the full message history on every emission. For a demo this is fine, but a real chat with hundreds of messages would replace this with a `PagingSource` backed query and wire `LazyPagingItems` into the Compose layer — keeping memory flat regardless of history size.
+
+**Error handling on writes.** A failed `repository.insert()` is currently silently dropped. With more time I'd wrap the coroutine in a try/catch, emit an error state, and restore the input text so the user can retry without losing their message.
+
+**Compose UI tests.** Business logic is covered by unit tests, but there are no instrumented tests asserting that `DateSectionHeader` and bubble grouping render correctly end-to-end. I'd add a Compose test that seeds a known message list and verifies the rendered output.
+
+**Per-bubble timestamps.** The design shows them. I'd add them conditionally — visible only on the last message of a group — to match the spec without visual noise.
+
+**Splash screen guard.** `DatabaseSeeder` currently runs fire-and-forget in a detached `CoroutineScope(Dispatchers.IO)`. ~10 inserts finishes within one frame in practice, but a larger seed would need `SplashScreen.setKeepOnScreenCondition` to hold the splash until the data is ready.
+
+**Fixed users, no identity.** Sender switching via button is intentional per spec. A real app would replace this with proper authentication and map each message to an account, making the conversation model server-ready.
