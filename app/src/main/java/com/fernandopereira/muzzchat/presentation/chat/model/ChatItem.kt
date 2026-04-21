@@ -8,5 +8,5 @@ sealed interface ChatItem {
         val isGroupedWithNext: Boolean,
     ) : ChatItem
 
-    data class DateHeader(val label: String) : ChatItem
+    data class DateHeader(val day: String, val time: String) : ChatItem
 }

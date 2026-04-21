@@ -2,14 +2,15 @@ package com.fernandopereira.muzzchat.domain.usecase
 
 import com.fernandopereira.muzzchat.common.ONE_HOUR_MS
 import com.fernandopereira.muzzchat.common.TWENTY_SECONDS_MS
-import com.fernandopereira.muzzchat.common.dateHeaderFormatter
+import com.fernandopereira.muzzchat.common.formatDay
+import com.fernandopereira.muzzchat.common.formatTime
 import com.fernandopereira.muzzchat.domain.model.Message
 import com.fernandopereira.muzzchat.domain.model.User
+import com.fernandopereira.muzzchat.domain.model.User.ME
 import com.fernandopereira.muzzchat.presentation.chat.model.ChatItem
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.time.Instant
 
 class BuildChatItemsUseCaseTest {
     private val useCase = BuildChatItemsUseCase()
@@ -29,14 +30,14 @@ class BuildChatItemsUseCaseTest {
     @Test
     fun `GIVEN single message WHEN invoked THEN produces date header and ungrouped item`() {
         // GIVEN
-        val message = message(id = 1, timestamp = T0, sender = User.ME)
+        val message = message(id = 1, timestamp = T0, sender = ME)
 
         // WHEN
         val items = useCase(listOf(message))
 
         // THEN
         assertEquals(2, items.size)
-        assertEquals(ChatItem.DateHeader(label(T0)), items[0])
+        assertEquals(ChatItem.DateHeader(formatDay(T0), formatTime(T0)), items[0])
         assertEquals(
             ChatItem.MessageItem(message = message, isGroupedWithNext = false),
             items[1],
@@ -77,8 +78,8 @@ class BuildChatItemsUseCaseTest {
     @Test
     fun `GIVEN same sender WHEN gap is below twenty seconds THEN first message is grouped with next`() {
         // GIVEN
-        val first = message(id = 1, timestamp = T0, sender = User.ME)
-        val second = message(id = 2, timestamp = T0 + TWENTY_SECONDS_MS - 1, sender = User.ME)
+        val first = message(id = 1, timestamp = T0, sender = ME)
+        val second = message(id = 2, timestamp = T0 + TWENTY_SECONDS_MS - 1, sender = ME)
 
         // WHEN
         val items = useCase(listOf(first, second))
@@ -91,8 +92,8 @@ class BuildChatItemsUseCaseTest {
     @Test
     fun `GIVEN same sender WHEN gap equals twenty seconds THEN grouping is false`() {
         // GIVEN
-        val first = message(id = 1, timestamp = T0, sender = User.ME)
-        val second = message(id = 2, timestamp = T0 + TWENTY_SECONDS_MS, sender = User.ME)
+        val first = message(id = 1, timestamp = T0, sender = ME)
+        val second = message(id = 2, timestamp = T0 + TWENTY_SECONDS_MS, sender = ME)
 
         // WHEN
         val items = useCase(listOf(first, second))
@@ -104,7 +105,7 @@ class BuildChatItemsUseCaseTest {
     @Test
     fun `GIVEN different senders WHEN gap is below twenty seconds THEN grouping is false`() {
         // GIVEN
-        val first = message(id = 1, timestamp = T0, sender = User.ME)
+        val first = message(id = 1, timestamp = T0, sender = ME)
         val second = message(id = 2, timestamp = T0 + 1_000, sender = User.SARAH)
 
         // WHEN
@@ -117,8 +118,8 @@ class BuildChatItemsUseCaseTest {
     @Test
     fun `GIVEN same sender messages WHEN last item evaluated THEN grouping is always false`() {
         // GIVEN
-        val first = message(id = 1, timestamp = T0, sender = User.ME)
-        val second = message(id = 2, timestamp = T0 + 1_000, sender = User.ME)
+        val first = message(id = 1, timestamp = T0, sender = ME)
+        val second = message(id = 2, timestamp = T0 + 1_000, sender = ME)
 
         // WHEN
         val items = useCase(listOf(first, second))
@@ -134,11 +135,11 @@ class BuildChatItemsUseCaseTest {
         // Burst 2: SARAH@T0+2h, ME@T0+2h+30s
         val messages =
             listOf(
-                message(id = 1, timestamp = T0, sender = User.ME),
-                message(id = 2, timestamp = T0 + 5_000, sender = User.ME),
+                message(id = 1, timestamp = T0, sender = ME),
+                message(id = 2, timestamp = T0 + 5_000, sender = ME),
                 message(id = 3, timestamp = T0 + 10_000, sender = User.SARAH),
                 message(id = 4, timestamp = T0 + 2 * ONE_HOUR_MS, sender = User.SARAH),
-                message(id = 5, timestamp = T0 + 2 * ONE_HOUR_MS + 30_000, sender = User.ME),
+                message(id = 5, timestamp = T0 + 2 * ONE_HOUR_MS + 30_000, sender = ME),
             )
 
         // WHEN
@@ -164,7 +165,7 @@ class BuildChatItemsUseCaseTest {
         val items = useCase(listOf(message))
 
         // THEN
-        assertEquals(ChatItem.DateHeader(label(T0)), items[0])
+        assertEquals(ChatItem.DateHeader(formatDay(T0), formatTime(T0)), items[0])
     }
 
     private companion object {
@@ -174,11 +175,8 @@ class BuildChatItemsUseCaseTest {
         fun message(
             id: Long,
             timestamp: Long,
-            sender: User = User.ME,
+            sender: User = ME,
             text: String = "msg-$id",
         ) = Message(id = id, text = text, sender = sender, timestamp = timestamp)
-
-        fun label(timestamp: Long): String =
-            dateHeaderFormatter.format(Instant.ofEpochMilli(timestamp))
     }
 }

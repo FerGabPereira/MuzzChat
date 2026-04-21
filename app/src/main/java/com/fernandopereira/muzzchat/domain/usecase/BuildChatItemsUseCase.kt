@@ -2,10 +2,10 @@ package com.fernandopereira.muzzchat.domain.usecase
 
 import com.fernandopereira.muzzchat.common.ONE_HOUR_MS
 import com.fernandopereira.muzzchat.common.TWENTY_SECONDS_MS
-import com.fernandopereira.muzzchat.common.dateHeaderFormatter
+import com.fernandopereira.muzzchat.common.formatDay
+import com.fernandopereira.muzzchat.common.formatTime
 import com.fernandopereira.muzzchat.domain.model.Message
 import com.fernandopereira.muzzchat.presentation.chat.model.ChatItem
-import java.time.Instant
 
 /**
  * Transforms a list of [Message]s into the flat list of [ChatItem]s the UI renders.
@@ -30,7 +30,10 @@ class BuildChatItemsUseCase {
                 val next = messages.getOrNull(index + 1)
 
                 if (needsDateHeader(message, previous)) {
-                    add(ChatItem.DateHeader(formatLabel(message.timestamp)))
+                    ChatItem.DateHeader(
+                        day = formatDay(message.timestamp),
+                        time = formatTime(message.timestamp),
+                    )
                 }
 
                 add(
@@ -49,7 +52,4 @@ class BuildChatItemsUseCase {
         next != null &&
             next.sender == message.sender &&
             next.timestamp - message.timestamp < TWENTY_SECONDS_MS
-
-    private fun formatLabel(timestamp: Long): String =
-        dateHeaderFormatter.format(Instant.ofEpochMilli(timestamp))
 }
