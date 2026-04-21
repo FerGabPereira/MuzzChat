@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">MuzzChat</string>
+    <string name="chat_user_me">You</string>
+    <string name="chat_user_sarah">Sarah</string>
+    <string name="chat_message_placeholder">Message…</string>
+    <string name="chat_send_message_content_description">Send message</string>
+    <string name="chat_reply_as">Reply as %1$s</string>
 </resources>
