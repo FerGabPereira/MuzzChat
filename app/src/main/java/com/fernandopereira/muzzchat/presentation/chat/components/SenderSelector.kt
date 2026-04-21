@@ -20,12 +20,12 @@ import com.fernandopereira.muzzchat.domain.model.User
 import com.fernandopereira.muzzchat.domain.model.User.ME
 import com.fernandopereira.muzzchat.presentation.chat.extensions.displayName
 import com.fernandopereira.muzzchat.ui.common.ThemePreviews
-import com.fernandopereira.muzzchat.ui.theme.MuzzChatTheme
-import com.fernandopereira.muzzchat.ui.theme.RadiusFull
+import com.fernandopereira.muzzchat.ui.theme.Dimen16
 import com.fernandopereira.muzzchat.ui.theme.Dimen2
 import com.fernandopereira.muzzchat.ui.theme.Dimen4
 import com.fernandopereira.muzzchat.ui.theme.Dimen8
-import com.fernandopereira.muzzchat.ui.theme.Dimen16
+import com.fernandopereira.muzzchat.ui.theme.MuzzChatTheme
+import com.fernandopereira.muzzchat.ui.theme.RadiusFull
 
 private const val ANIMATION_DURATION_MS = 200
 
@@ -77,13 +77,14 @@ private fun SenderTab(
         text = label,
         style = MaterialTheme.typography.labelLarge,
         color = contentColor,
-        modifier = Modifier
-            .background(
-                color = backgroundColor,
-                shape = RoundedCornerShape(RadiusFull),
-            )
-            .clickable(onClick = onClick)
-            .padding(horizontal = Dimen16, vertical = Dimen4),
+        modifier =
+            Modifier
+                .background(
+                    color = backgroundColor,
+                    shape = RoundedCornerShape(RadiusFull),
+                )
+                .clickable(onClick = onClick)
+                .padding(horizontal = Dimen16, vertical = Dimen4),
     )
 }
 

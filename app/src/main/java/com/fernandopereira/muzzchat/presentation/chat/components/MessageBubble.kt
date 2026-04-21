@@ -75,8 +75,8 @@ private fun bubbleStyle(sender: User): BubbleStyle {
     val isMine = sender == ME
     return BubbleStyle(
         arrangement = if (isMine) Arrangement.End else Arrangement.Start,
-        bubbleColor = if (isMine) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-        contentColor = if (isMine) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+        bubbleColor = if (isMine) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = if (isMine) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
         shape = if (isMine) {
             RoundedCornerShape(
                 topStart = RadiusLarge,
