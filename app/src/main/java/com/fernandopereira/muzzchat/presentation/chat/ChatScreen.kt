@@ -14,12 +14,15 @@ import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fernandopereira.muzzchat.domain.model.User
 import com.fernandopereira.muzzchat.presentation.chat.components.ChatTopBar
 import com.fernandopereira.muzzchat.presentation.chat.components.DateSectionHeader
 import com.fernandopereira.muzzchat.presentation.chat.components.MessageBubble
@@ -81,26 +84,45 @@ fun ChatScreen(viewModel: ChatViewModel = koinViewModel()) {
                 }
             }
 
-            ReplyAsRow(
+            ChatFooter(
                 currentUser = uiState.currentUser,
                 onUserSelected = { user ->
                     if (user != uiState.currentUser) viewModel.onAction(ChatUiAction.OnSwitchUserClicked)
                 },
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = Dimen12, vertical = Dimen8),
-            )
-
-            MessageInput(
-                text = uiState.inputText,
+                inputText = uiState.inputText,
                 onTextChange = { viewModel.onAction(ChatUiAction.InputChanged(it)) },
                 onSend = { viewModel.onAction(ChatUiAction.OnSendMessageClicked) },
-                modifier =
-                    Modifier
-                        .padding(horizontal = Dimen12)
-                        .padding(bottom = Dimen8),
             )
         }
+    }
+}
+
+@Composable
+private fun ChatFooter(
+    currentUser: User,
+    onUserSelected: (User) -> Unit,
+    inputText: String,
+    onTextChange: (String) -> Unit,
+    onSend: () -> Unit,
+) {
+    Column {
+        HorizontalDivider()
+        ReplyAsRow(
+            currentUser = currentUser,
+            onUserSelected = onUserSelected,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Dimen12, vertical = Dimen8),
+        )
+        MessageInput(
+            text = inputText,
+            onTextChange = onTextChange,
+            onSend = onSend,
+            modifier =
+                Modifier
+                    .padding(horizontal = Dimen12)
+                    .padding(bottom = Dimen8),
+        )
     }
 }
