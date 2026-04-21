@@ -30,9 +30,11 @@ class BuildChatItemsUseCase {
                 val next = messages.getOrNull(index + 1)
 
                 if (needsDateHeader(message, previous)) {
-                    ChatItem.DateHeader(
-                        day = formatDay(message.timestamp),
-                        time = formatTime(message.timestamp),
+                    add(
+                        ChatItem.DateHeader(
+                            day = formatDay(message.timestamp),
+                            time = formatTime(message.timestamp),
+                        ),
                     )
                 }
 
