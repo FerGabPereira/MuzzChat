@@ -24,7 +24,7 @@ import com.fernandopereira.muzzchat.presentation.chat.model.ChatItem
  */
 class BuildChatItemsUseCase {
     operator fun invoke(messages: List<Message>): List<ChatItem> =
-        buildList(messages.size * 2) {
+        buildList {
             messages.forEachIndexed { index, message ->
                 val previous = messages.getOrNull(index - 1)
                 val next = messages.getOrNull(index + 1)

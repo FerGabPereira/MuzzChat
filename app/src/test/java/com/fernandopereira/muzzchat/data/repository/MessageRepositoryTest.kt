@@ -1,9 +1,10 @@
 package com.fernandopereira.muzzchat.data.repository
 
 import app.cash.turbine.test
+import com.fernandopereira.muzzchat.data.local.MessageDao
+import com.fernandopereira.muzzchat.data.local.MessageEntity
 import com.fernandopereira.muzzchat.domain.model.Message
 import com.fernandopereira.muzzchat.domain.model.User
-import com.fernandopereira.muzzchat.domain.repository.MessageRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -14,31 +15,61 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class MessageRepositoryTest {
-    private val repository: MessageRepository = mockk()
+    private val dao: MessageDao = mockk()
 
     @Test
-    fun `GIVEN messages in repository WHEN messages flow collected THEN emits current list`() =
+    fun `GIVEN dao emits entities WHEN messages flow is collected THEN entities are mapped to domain messages`() =
         runTest {
             // GIVEN
-            val messages =
+            val entities =
                 listOf(
-                    Message(id = 1, text = "hello", sender = User.ME, timestamp = 0L),
-                    Message(id = 2, text = "hey", sender = User.SARAH, timestamp = 1_000L),
+                    MessageEntity(
+                        id = 1,
+                        text = "hello",
+                        senderId = User.ME.id,
+                        timestamp = 1_000L,
+                    ),
+                    MessageEntity(
+                        id = 2,
+                        text = "hi there",
+                        senderId = User.SARAH.id,
+                        timestamp = 2_000L,
+                    ),
                 )
-            every { repository.messages } returns flowOf(messages)
+            every { dao.observeAll() } returns flowOf(entities)
+
+            val repository = MessageRepositoryImpl(dao = dao)
 
             // WHEN / THEN
             repository.messages.test {
-                assertEquals(messages, awaitItem())
+                assertEquals(
+                    listOf(
+                        Message(
+                            id = 1,
+                            text = "hello",
+                            sender = User.ME,
+                            timestamp = 1_000L,
+                        ),
+                        Message(
+                            id = 2,
+                            text = "hi there",
+                            sender = User.SARAH,
+                            timestamp = 2_000L,
+                        ),
+                    ),
+                    awaitItem(),
+                )
                 awaitComplete()
             }
         }
 
     @Test
-    fun `GIVEN empty repository WHEN messages flow collected THEN emits empty list`() =
+    fun `GIVEN dao emits empty list WHEN messages flow is collected THEN repository emits empty list`() =
         runTest {
             // GIVEN
-            every { repository.messages } returns flowOf(emptyList())
+            every { dao.observeAll() } returns flowOf(emptyList())
+
+            val repository = MessageRepositoryImpl(dao = dao)
 
             // WHEN / THEN
             repository.messages.test {
@@ -48,16 +79,34 @@ class MessageRepositoryTest {
         }
 
     @Test
-    fun `GIVEN a message WHEN insert called THEN delegates to repository exactly once`() =
+    fun `GIVEN a domain message WHEN insert is called THEN repository maps it and delegates to dao`() =
         runTest {
             // GIVEN
-            val message = Message(id = 1, text = "hello", sender = User.ME, timestamp = 0L)
-            coEvery { repository.insert(message) } returns Unit
+            val message =
+                Message(
+                    id = 7,
+                    text = "ping",
+                    sender = User.SARAH,
+                    timestamp = 9_999L,
+                )
+            every { dao.observeAll() } returns flowOf(emptyList())
+            coEvery { dao.insert(any()) } returns Unit
+
+            val repository = MessageRepositoryImpl(dao = dao)
 
             // WHEN
             repository.insert(message)
 
             // THEN
-            coVerify(exactly = 1) { repository.insert(message) }
+            coVerify(exactly = 1) {
+                dao.insert(
+                    MessageEntity(
+                        id = 7,
+                        text = "ping",
+                        senderId = User.SARAH.id,
+                        timestamp = 9_999L,
+                    ),
+                )
+            }
         }
 }
