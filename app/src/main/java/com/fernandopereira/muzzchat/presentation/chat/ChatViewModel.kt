@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class ChatViewModel(
     private val repository: MessageRepository,
-    private val buildChatItems: BuildChatItemsUseCase,
+    private val buildChatItemsUseCase: BuildChatItemsUseCase,
 ) : BaseViewModel<ChatUiState, ChatUiAction>(ChatUiState()) {
     init {
         observeMessages()
@@ -58,7 +58,7 @@ class ChatViewModel(
         viewModelScope.launch {
             repository.messages.collectLatest { messages ->
                 submitState {
-                    copy(items = buildChatItems(messages))
+                    copy(items = buildChatItemsUseCase(messages))
                 }
             }
         }

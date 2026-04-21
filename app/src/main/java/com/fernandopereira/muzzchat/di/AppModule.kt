@@ -15,5 +15,5 @@ val appModule =
         single { get<MessageDatabase>().messageDao() }
         single<MessageRepository> { MessageRepositoryImpl(dao = get()) }
         factory { BuildChatItemsUseCase() }
-        viewModel { ChatViewModel(repository = get(), buildChatItems = get()) }
+        viewModel { ChatViewModel(repository = get(), buildChatItemsUseCase = get()) }
     }

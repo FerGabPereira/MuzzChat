@@ -3,11 +3,14 @@ package com.fernandopereira.muzzchat.presentation.chat
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -23,8 +26,8 @@ import com.fernandopereira.muzzchat.presentation.chat.components.MessageBubble
 import com.fernandopereira.muzzchat.presentation.chat.components.MessageInput
 import com.fernandopereira.muzzchat.presentation.chat.components.ReplyAsRow
 import com.fernandopereira.muzzchat.presentation.chat.model.ChatItem
-import com.fernandopereira.muzzchat.ui.theme.Dimen8
 import com.fernandopereira.muzzchat.ui.theme.Dimen12
+import com.fernandopereira.muzzchat.ui.theme.Dimen8
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -34,35 +37,46 @@ fun ChatScreen(viewModel: ChatViewModel = koinViewModel()) {
 
     LaunchedEffect(uiState.items.size) {
         if (uiState.items.isNotEmpty()) {
-            listState.animateScrollToItem(uiState.items.lastIndex)
+            listState.animateScrollToItem(0)
         }
     }
 
     Scaffold(
-        contentWindowInsets = WindowInsets.systemBars,
+        contentWindowInsets = WindowInsets.systemBars.union(WindowInsets.displayCutout),
         topBar = { ChatTopBar() },
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .imePadding(),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .imePadding(),
         ) {
+            // The list is reversed here because `reverseLayout` is a rendering concern.
+            // Messages stay in chronological order in the use case, and the UI adapts them
+            // for display so the scroll position is preserved when the keyboard opens.
             LazyColumn(
+                reverseLayout = true,
                 state = listState,
                 modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(horizontal = Dimen12, vertical = Dimen8),
             ) {
-                items(items = uiState.items, key = { it.key }) { item ->
+                items(items = uiState.items.asReversed(), key = { it.key }) { item ->
                     when (item) {
-                        is ChatItem.DateHeader -> DateSectionHeader(
-                            day = item.day,
-                            time = item.time,
-                        )
-                        is ChatItem.MessageItem -> MessageBubble(
-                            message = item.message,
-                            isGroupedWithNext = item.isGroupedWithNext,
-                        )
+                        is ChatItem.DateHeader -> {
+                            DateSectionHeader(
+                                day = item.day,
+                                time = item.time,
+                            )
+                        }
+
+                        is ChatItem.MessageItem -> {
+                            MessageBubble(
+                                message = item.message,
+                                isGroupedWithNext = item.isGroupedWithNext,
+                            )
+                        }
                     }
                 }
             }
@@ -72,18 +86,20 @@ fun ChatScreen(viewModel: ChatViewModel = koinViewModel()) {
                 onUserSelected = { user ->
                     if (user != uiState.currentUser) viewModel.onAction(ChatUiAction.OnSwitchUserClicked)
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = Dimen12, vertical = Dimen8),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = Dimen12, vertical = Dimen8),
             )
 
             MessageInput(
                 text = uiState.inputText,
                 onTextChange = { viewModel.onAction(ChatUiAction.InputChanged(it)) },
                 onSend = { viewModel.onAction(ChatUiAction.OnSendMessageClicked) },
-                modifier = Modifier
-                    .padding(horizontal = Dimen12)
-                    .padding(bottom = Dimen8),
+                modifier =
+                    Modifier
+                        .padding(horizontal = Dimen12)
+                        .padding(bottom = Dimen8),
             )
         }
     }
