@@ -54,3 +54,13 @@ The two rules it applies are asymmetric in the direction they look:
 - **isGroupedWithNext** looks *forward*. To know whether message N should have reduced spacing below it, you need to know when message N+1 will arrive and whether it comes from the same sender. If the next message exists, shares the sender, and arrives within 20 seconds, the flag is set to `true`.
 
 This look-ahead vs look-back asymmetry is why a simple `fold` or `map` isn't enough — the use case iterates with `forEachIndexed` and reads both `index - 1` and `index + 1` via `getOrNull`.
+
+### State management
+
+The presentation layer uses a small `UiState` / `UiAction` contract with a generic `BaseViewModel`.
+The View dispatches actions, and all state mutations go through `submitState { copy(...) }`, which keeps updates centralized and predictable.
+
+`submitState` short-circuits when the reducer returns an equal state, avoiding redundant `StateFlow` emissions and unnecessary recomposition.
+
+There is no `UiEffect` channel because this screen has no one-shot side effects such as navigation, snackbars, or permission requests.
+Everything the UI needs is durable state: the rendered chat items, the current input text, and the active sender.
