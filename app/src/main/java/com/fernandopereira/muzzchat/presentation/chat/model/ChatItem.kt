@@ -15,7 +15,8 @@ sealed interface ChatItem {
     data class DateHeader(
         val day: String,
         val time: String,
+        val timestamp: Long,
     ) : ChatItem {
-        override val key: Any get() = "header_${day}_${time}"
+        override val key: Any get() = "header_$timestamp"
     }
 }

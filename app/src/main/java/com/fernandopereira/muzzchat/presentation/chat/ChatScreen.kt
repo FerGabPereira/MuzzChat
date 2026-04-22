@@ -39,7 +39,7 @@ fun ChatScreen(viewModel: ChatViewModel = koinViewModel()) {
     val listState = rememberLazyListState()
 
     LaunchedEffect(uiState.items.size) {
-        if (uiState.items.isNotEmpty()) {
+        if (uiState.items.isNotEmpty() && !listState.canScrollBackward) {
             listState.animateScrollToItem(0)
         }
     }

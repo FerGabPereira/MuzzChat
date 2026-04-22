@@ -34,6 +34,7 @@ class BuildChatItemsUseCase {
                         ChatItem.DateHeader(
                             day = formatDay(message.timestamp),
                             time = formatTime(message.timestamp),
+                            timestamp = message.timestamp,
                         ),
                     )
                 }

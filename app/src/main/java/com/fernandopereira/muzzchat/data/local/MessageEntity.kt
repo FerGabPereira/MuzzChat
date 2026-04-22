@@ -17,7 +17,8 @@ fun MessageEntity.toMessage(): Message =
     Message(
         id = id,
         text = text,
-        sender = User.entries.first { it.id == senderId },
+        sender = User.entries.firstOrNull { it.id == senderId }
+            ?: error("Unknown senderId: $senderId"),
         timestamp = timestamp,
     )
 

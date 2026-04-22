@@ -14,7 +14,7 @@ val appModule =
     module {
         single { MessageDatabase.build(androidContext()) }
         single { get<MessageDatabase>().messageDao() }
-        single<MessageRepository> { MessageRepositoryImpl(dao = get()) }
+        single<MessageRepository> { MessageRepositoryImpl(dao = get(), seeder = get()) }
         single { DatabaseSeeder(dao = get()) }
         factory { BuildChatItemsUseCase() }
         viewModel { ChatViewModel(repository = get(), buildChatItemsUseCase = get()) }
