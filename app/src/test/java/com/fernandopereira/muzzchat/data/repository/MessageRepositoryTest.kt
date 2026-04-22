@@ -101,6 +101,7 @@ class MessageRepositoryTest {
     fun `GIVEN a repository WHEN seedIfNeeded is called THEN delegates to seeder seedIfEmpty`() =
         runTest {
             // GIVEN
+            every { dao.observeAll() } returns flowOf(emptyList())
             coJustRun { seeder.seedIfEmpty() }
 
             val repository = MessageRepositoryImpl(dao = dao, seeder = seeder)
