@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.data.local
+﻿package com.fernandopereira.muzzchat.data.local
 
 import androidx.room.Dao
 import androidx.room.Insert

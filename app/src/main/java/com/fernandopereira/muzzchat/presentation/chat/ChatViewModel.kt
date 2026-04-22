@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.presentation.chat
+﻿package com.fernandopereira.muzzchat.presentation.chat
 
 import androidx.lifecycle.viewModelScope
 import com.fernandopereira.muzzchat.domain.model.Message

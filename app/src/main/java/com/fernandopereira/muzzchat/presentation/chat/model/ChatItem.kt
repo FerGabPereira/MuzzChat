@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.presentation.chat.model
+﻿package com.fernandopereira.muzzchat.presentation.chat.model
 
 import com.fernandopereira.muzzchat.domain.model.Message
 

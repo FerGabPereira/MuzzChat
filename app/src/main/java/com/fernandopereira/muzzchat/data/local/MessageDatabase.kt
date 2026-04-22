@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.data.local
+﻿package com.fernandopereira.muzzchat.data.local
 
 import android.content.Context
 import androidx.room.Database

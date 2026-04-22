@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.presentation.chat
+﻿package com.fernandopereira.muzzchat.presentation.chat
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues

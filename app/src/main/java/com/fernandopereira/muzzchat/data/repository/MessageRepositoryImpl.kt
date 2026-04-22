@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.data.repository
+﻿package com.fernandopereira.muzzchat.data.repository
 
 import com.fernandopereira.muzzchat.data.local.DatabaseSeeder
 import com.fernandopereira.muzzchat.data.local.MessageDao

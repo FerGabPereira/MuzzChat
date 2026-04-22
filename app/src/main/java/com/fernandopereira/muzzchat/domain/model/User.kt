@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.domain.model
+﻿package com.fernandopereira.muzzchat.domain.model
 
 enum class User(val id: String) {
     ME("me"),

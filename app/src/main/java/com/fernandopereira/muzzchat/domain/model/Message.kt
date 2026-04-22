@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.domain.model
+﻿package com.fernandopereira.muzzchat.domain.model
 
 data class Message(
     val id: Long = 0,

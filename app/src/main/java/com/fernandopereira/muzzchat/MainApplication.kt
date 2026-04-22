@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat
+﻿package com.fernandopereira.muzzchat
 
 import android.app.Application
 import com.fernandopereira.muzzchat.di.appModule

@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.presentation.chat.components
+﻿package com.fernandopereira.muzzchat.presentation.chat.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween

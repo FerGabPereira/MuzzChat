@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.data.repository
+﻿package com.fernandopereira.muzzchat.data.repository
 
 import app.cash.turbine.test
 import com.fernandopereira.muzzchat.data.local.DatabaseSeeder

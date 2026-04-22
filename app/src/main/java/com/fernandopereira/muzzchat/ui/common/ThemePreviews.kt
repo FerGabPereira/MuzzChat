@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.ui.common
+﻿package com.fernandopereira.muzzchat.ui.common
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES

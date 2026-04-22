@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.data.local
+﻿package com.fernandopereira.muzzchat.data.local
 
 import com.fernandopereira.muzzchat.domain.model.User
 import com.fernandopereira.muzzchat.domain.model.User.ME

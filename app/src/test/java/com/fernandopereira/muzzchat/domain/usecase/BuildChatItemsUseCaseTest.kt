@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.domain.usecase
+﻿package com.fernandopereira.muzzchat.domain.usecase
 
 import com.fernandopereira.muzzchat.common.ONE_HOUR_MS
 import com.fernandopereira.muzzchat.common.TWENTY_SECONDS_MS

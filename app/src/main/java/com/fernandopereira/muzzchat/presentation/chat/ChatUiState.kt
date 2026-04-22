@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.presentation.chat
+﻿package com.fernandopereira.muzzchat.presentation.chat
 
 import com.fernandopereira.muzzchat.domain.model.User
 import com.fernandopereira.muzzchat.domain.model.User.ME

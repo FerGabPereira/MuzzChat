@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.ui.theme
+﻿package com.fernandopereira.muzzchat.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.presentation
+﻿package com.fernandopereira.muzzchat.presentation
 
 interface UiState
 

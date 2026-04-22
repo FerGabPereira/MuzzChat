@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.presentation.chat.extensions
+﻿package com.fernandopereira.muzzchat.presentation.chat.extensions
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource

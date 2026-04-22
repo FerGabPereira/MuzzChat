@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.presentation.chat.components
+﻿package com.fernandopereira.muzzchat.presentation.chat.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme

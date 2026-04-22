@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.common
+﻿package com.fernandopereira.muzzchat.common
 
 import java.time.Instant.ofEpochMilli
 import java.time.ZoneId

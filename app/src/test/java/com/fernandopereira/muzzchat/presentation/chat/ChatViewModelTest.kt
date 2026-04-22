@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.presentation.chat
+﻿package com.fernandopereira.muzzchat.presentation.chat
 
 import app.cash.turbine.test
 import com.fernandopereira.muzzchat.common.MainDispatcherRule

@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.domain.repository
+﻿package com.fernandopereira.muzzchat.domain.repository
 
 import com.fernandopereira.muzzchat.domain.model.Message
 import kotlinx.coroutines.flow.Flow

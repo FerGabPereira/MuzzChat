@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat
+﻿package com.fernandopereira.muzzchat
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

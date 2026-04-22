@@ -1,4 +1,4 @@
-package com.fernandopereira.muzzchat.common
+﻿package com.fernandopereira.muzzchat.common
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
