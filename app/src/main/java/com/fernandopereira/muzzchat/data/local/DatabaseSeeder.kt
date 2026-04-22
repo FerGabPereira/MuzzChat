@@ -15,30 +15,28 @@ import kotlinx.coroutines.flow.first
  *   Demonstrated by the 2-hour gap between the two clusters.
  */
 class DatabaseSeeder(private val dao: MessageDao) {
-
     suspend fun seedIfEmpty() {
         if (dao.observeAll().first().isNotEmpty()) return
         buildSeedMessages().forEach { dao.insert(it) }
     }
 
     private fun buildSeedMessages(): List<MessageEntity> {
-        val clusterB = System.currentTimeMillis()
+        val clusterB = System.currentTimeMillis() - 180.seconds
         val clusterA = clusterB - TWO_HOURS // gap > 1 h → DateHeader between clusters
 
         return listOf(
             // Cluster A
-            entity(SARAH, "Hey! Are you free later?",            clusterA),
-            entity(ME,    "Yeah, what's up?",                    clusterA + 12.seconds),
-            entity(ME,    "Something on your mind?",             clusterA + 19.seconds), // < 20 s → grouped
+            entity(SARAH, "Hey! Are you free later?", clusterA),
+            entity(ME, "Yeah, what's up?", clusterA + 12.seconds),
+            entity(ME, "Something on your mind?", clusterA + 19.seconds), // < 20 s → grouped
             entity(SARAH, "I was thinking we could grab coffee", clusterA + 40.seconds),
             entity(SARAH, "There's a new place near the office", clusterA + 55.seconds), // < 20 s → grouped
-
             // Cluster B — 2 h later, DateHeader inserted before this cluster
-            entity(ME,    "Sorry, just got out of a meeting!",   clusterB),
-            entity(ME,    "What were you saying about coffee?",  clusterB + 9.seconds),  // < 20 s → grouped
-            entity(SARAH, "No worries! Coffee tomorrow? ☕",     clusterB + 35.seconds),
-            entity(SARAH, "There's a spot near the office",      clusterB + 48.seconds), // < 20 s → grouped
-            entity(ME,    "10am works perfectly!",               clusterB + 90.seconds),
+            entity(ME, "Sorry, just got out of a meeting!", clusterB),
+            entity(ME, "What were you saying about coffee?", clusterB + 9.seconds), // < 20 s → grouped
+            entity(SARAH, "No worries! Coffee tomorrow? ☕", clusterB + 35.seconds),
+            entity(SARAH, "There's a spot near the office", clusterB + 48.seconds), // < 20 s → grouped
+            entity(ME, "10am works perfectly!", clusterB + 90.seconds),
         )
     }
 
