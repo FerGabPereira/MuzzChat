@@ -1,11 +1,13 @@
 package com.fernandopereira.muzzchat.data.repository
 
 import app.cash.turbine.test
+import com.fernandopereira.muzzchat.data.local.DatabaseSeeder
 import com.fernandopereira.muzzchat.data.local.MessageDao
 import com.fernandopereira.muzzchat.data.local.MessageEntity
 import com.fernandopereira.muzzchat.domain.model.Message
 import com.fernandopereira.muzzchat.domain.model.User
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -16,6 +18,7 @@ import org.junit.Test
 
 class MessageRepositoryTest {
     private val dao: MessageDao = mockk()
+    private val seeder: DatabaseSeeder = mockk()
 
     @Test
     fun `GIVEN dao emits entities WHEN messages flow is collected THEN entities are mapped to domain messages`() =
@@ -37,8 +40,9 @@ class MessageRepositoryTest {
                     ),
                 )
             every { dao.observeAll() } returns flowOf(entities)
+            coJustRun { seeder.seedIfEmpty() }
 
-            val repository = MessageRepositoryImpl(dao = dao)
+            val repository = MessageRepositoryImpl(dao = dao, seeder = seeder)
 
             // WHEN / THEN
             repository.messages.test {
@@ -68,8 +72,9 @@ class MessageRepositoryTest {
         runTest {
             // GIVEN
             every { dao.observeAll() } returns flowOf(emptyList())
+            coJustRun { seeder.seedIfEmpty() }
 
-            val repository = MessageRepositoryImpl(dao = dao)
+            val repository = MessageRepositoryImpl(dao = dao, seeder = seeder)
 
             // WHEN / THEN
             repository.messages.test {
@@ -85,7 +90,7 @@ class MessageRepositoryTest {
             every { dao.observeAll() } returns flowOf(emptyList())
             coEvery { dao.deleteAll() } returns Unit
 
-            val repository = MessageRepositoryImpl(dao = dao)
+            val repository = MessageRepositoryImpl(dao = dao, seeder = seeder)
 
             // WHEN
             repository.deleteAll()
@@ -108,7 +113,7 @@ class MessageRepositoryTest {
             every { dao.observeAll() } returns flowOf(emptyList())
             coEvery { dao.insert(any()) } returns Unit
 
-            val repository = MessageRepositoryImpl(dao = dao)
+            val repository = MessageRepositoryImpl(dao = dao, seeder = seeder)
 
             // WHEN
             repository.insert(message)

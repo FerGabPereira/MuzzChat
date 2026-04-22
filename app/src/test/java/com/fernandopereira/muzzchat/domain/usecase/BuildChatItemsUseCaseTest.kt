@@ -383,6 +383,7 @@ class BuildChatItemsUseCaseTest {
             ChatItem.DateHeader(
                 day = formatDay(timestamp),
                 time = formatTime(timestamp),
+                timestamp = timestamp,
             )
     }
 }
