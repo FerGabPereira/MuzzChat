@@ -4,7 +4,6 @@
     <string name="chat_user_sarah">Sarah</string>
     <string name="chat_message_placeholder">Message…</string>
     <string name="chat_send_message_content_description">Send message</string>
-    <string name="chat_reply_as">Reply as %1$s</string>
     <string name="chat_reply_as_label">Reply as:</string>
     <string name="chat_more_options_content_description">More options</string>
     <string name="chat_clear_chat">Clear chat</string>

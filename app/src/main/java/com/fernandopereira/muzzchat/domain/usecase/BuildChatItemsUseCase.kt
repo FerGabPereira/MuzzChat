@@ -4,8 +4,8 @@ import com.fernandopereira.muzzchat.common.ONE_HOUR_MS
 import com.fernandopereira.muzzchat.common.TWENTY_SECONDS_MS
 import com.fernandopereira.muzzchat.common.formatDay
 import com.fernandopereira.muzzchat.common.formatTime
+import com.fernandopereira.muzzchat.domain.model.ChatItem
 import com.fernandopereira.muzzchat.domain.model.Message
-import com.fernandopereira.muzzchat.presentation.chat.model.ChatItem
 
 /**
  * Transforms a list of [Message]s into the flat list of [ChatItem]s the UI renders.

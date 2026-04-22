@@ -4,11 +4,11 @@ import com.fernandopereira.muzzchat.common.ONE_HOUR_MS
 import com.fernandopereira.muzzchat.common.TWENTY_SECONDS_MS
 import com.fernandopereira.muzzchat.common.formatDay
 import com.fernandopereira.muzzchat.common.formatTime
+import com.fernandopereira.muzzchat.domain.model.ChatItem
 import com.fernandopereira.muzzchat.domain.model.Message
 import com.fernandopereira.muzzchat.domain.model.User
 import com.fernandopereira.muzzchat.domain.model.User.ME
 import com.fernandopereira.muzzchat.domain.model.User.SARAH
-import com.fernandopereira.muzzchat.presentation.chat.model.ChatItem
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

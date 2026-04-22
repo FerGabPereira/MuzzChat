@@ -40,7 +40,6 @@ class MessageRepositoryTest {
                     ),
                 )
             every { dao.observeAll() } returns flowOf(entities)
-            coJustRun { seeder.seedIfEmpty() }
 
             val repository = MessageRepositoryImpl(dao = dao, seeder = seeder)
 
@@ -72,7 +71,6 @@ class MessageRepositoryTest {
         runTest {
             // GIVEN
             every { dao.observeAll() } returns flowOf(emptyList())
-            coJustRun { seeder.seedIfEmpty() }
 
             val repository = MessageRepositoryImpl(dao = dao, seeder = seeder)
 
@@ -97,6 +95,21 @@ class MessageRepositoryTest {
 
             // THEN
             coVerify(exactly = 1) { dao.deleteAll() }
+        }
+
+    @Test
+    fun `GIVEN a repository WHEN seedIfNeeded is called THEN delegates to seeder seedIfEmpty`() =
+        runTest {
+            // GIVEN
+            coJustRun { seeder.seedIfEmpty() }
+
+            val repository = MessageRepositoryImpl(dao = dao, seeder = seeder)
+
+            // WHEN
+            repository.seedIfNeeded()
+
+            // THEN
+            coVerify(exactly = 1) { seeder.seedIfEmpty() }
         }
 
     @Test

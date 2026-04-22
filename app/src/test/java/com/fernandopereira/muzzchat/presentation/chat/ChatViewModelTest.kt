@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -25,7 +26,9 @@ class ChatViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val repository: MessageRepository = mockk()
+    private val repository: MessageRepository = mockk {
+        coEvery { seedIfNeeded() } returns Unit
+    }
     private val buildChatItemsUseCase = BuildChatItemsUseCase()
 
     @Test
@@ -262,7 +265,7 @@ class ChatViewModelTest {
 
                 advanceUntilIdle()
 
-                assert(awaitItem().items.isNotEmpty())
+                assertTrue(awaitItem().items.isNotEmpty())
 
                 // WHEN
                 viewModel.onAction(ChatUiAction.ClearChat)

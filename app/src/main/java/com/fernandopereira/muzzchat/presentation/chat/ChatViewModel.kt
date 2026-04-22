@@ -17,6 +17,7 @@ class ChatViewModel(
     private val buildChatItemsUseCase: BuildChatItemsUseCase,
 ) : BaseViewModel<ChatUiState, ChatUiAction>(ChatUiState()) {
     init {
+        viewModelScope.launch { repository.seedIfNeeded() }
         observeMessages()
     }
 
