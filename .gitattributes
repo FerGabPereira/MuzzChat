@@ -1,0 +1,11 @@
+# Normalize all text files to LF on commit
+* text=auto eol=lf
+
+# Explicitly mark binary files
+*.png binary
+*.webp binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.keystore binary
