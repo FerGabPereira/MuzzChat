@@ -17,7 +17,7 @@ class ChatViewModel(
     private val buildChatItemsUseCase: BuildChatItemsUseCase,
 ) : BaseViewModel<ChatUiState, ChatUiAction>(ChatUiState()) {
     init {
-        viewModelScope.launch { repository.seedIfNeeded() }
+        triggerSeedIfNeeded()
         observeMessages()
     }
 
@@ -35,7 +35,9 @@ class ChatViewModel(
                 submitState { copy(currentUser = currentUser.other()) }
             }
 
-            ClearChat -> viewModelScope.launch { repository.deleteAll() }
+            ClearChat -> {
+                viewModelScope.launch { repository.deleteAll() }
+            }
         }
     }
 
@@ -66,5 +68,9 @@ class ChatViewModel(
                 }
             }
         }
+    }
+
+    private fun triggerSeedIfNeeded() {
+        viewModelScope.launch { repository.seedIfNeeded() }
     }
 }
