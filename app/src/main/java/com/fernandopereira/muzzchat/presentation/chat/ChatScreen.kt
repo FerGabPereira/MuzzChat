@@ -23,6 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fernandopereira.muzzchat.domain.model.ChatItem
 import com.fernandopereira.muzzchat.domain.model.User
+import com.fernandopereira.muzzchat.presentation.chat.ChatUiAction.ClearChat
+import com.fernandopereira.muzzchat.presentation.chat.ChatUiAction.InputChanged
+import com.fernandopereira.muzzchat.presentation.chat.ChatUiAction.OnSendMessageClicked
+import com.fernandopereira.muzzchat.presentation.chat.ChatUiAction.OnSwitchUserClicked
 import com.fernandopereira.muzzchat.presentation.chat.components.ChatTopBar
 import com.fernandopereira.muzzchat.presentation.chat.components.DateSectionHeader
 import com.fernandopereira.muzzchat.presentation.chat.components.MessageBubble
@@ -45,7 +49,7 @@ fun ChatScreen(viewModel: ChatViewModel = koinViewModel()) {
 
     Scaffold(
         contentWindowInsets = WindowInsets.systemBars.union(WindowInsets.displayCutout),
-        topBar = { ChatTopBar(onClearChat = { viewModel.onAction(ChatUiAction.ClearChat) }) },
+        topBar = { ChatTopBar(onClearChat = { viewModel.onAction(ClearChat) }) },
     ) { innerPadding ->
         Column(
             modifier =
@@ -86,11 +90,11 @@ fun ChatScreen(viewModel: ChatViewModel = koinViewModel()) {
             ChatFooter(
                 currentUser = uiState.currentUser,
                 onUserSelected = { user ->
-                    if (user != uiState.currentUser) viewModel.onAction(ChatUiAction.OnSwitchUserClicked)
+                    if (user != uiState.currentUser) viewModel.onAction(OnSwitchUserClicked)
                 },
                 inputText = uiState.inputText,
-                onTextChange = { viewModel.onAction(ChatUiAction.InputChanged(it)) },
-                onSend = { viewModel.onAction(ChatUiAction.OnSendMessageClicked) },
+                onTextChange = { viewModel.onAction(InputChanged(it)) },
+                onSend = { viewModel.onAction(OnSendMessageClicked) },
             )
         }
     }
